@@ -58,6 +58,8 @@
 <script>
 import Joi from '@hapi/joi';
 
+const [API_URL] = process.env.API_URL;
+
 const schema = Joi.object().keys({
   username: Joi.string().regex(/^[a-zA-Z0-9_]+$/).min(2).max(30)
     .required(),
@@ -105,7 +107,29 @@ export default {
     signup() {
       this.errorMessage = '';
       if (this.validUser()) {
-        // send data
+        const body = {
+          username: this.user.username,
+          password: this.user.password,
+        };
+
+        fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'content-type': 'application/json',
+          },
+        }).then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          return response.json().then((err) => {
+            throw new Error(err);
+          });
+        }).then((user) => {
+          console.log(user);
+        }).catch(((err) => {
+          console.log(err);
+        }));
       }
     },
   },
