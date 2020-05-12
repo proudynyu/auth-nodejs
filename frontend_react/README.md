@@ -20,4 +20,8 @@
     * [ ] Fetch data
         * [ ] method
 
-## Home Page
+Home Page: 
+![Home-Page](https://github.com/proudynyu/auth-nodejs/blob/master/frontend_react/public/home_page.png)
+
+Register Page:
+![Register-Page](https://github.com/proudynyu/auth-nodejs/blob/master/frontend_react/public/register_page.png)
