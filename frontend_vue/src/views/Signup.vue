@@ -6,6 +6,10 @@
             {{ errorMessage }}
         </div>
 
+        <div v-if="sucessMessage" class="alert alert-success" role="alert">
+          {{ sucessMessage }}
+        </div>
+
         <form autocomplete="off" @submit.prevent="signup">
         <div class="form-group">
             <label for="username">Username</label>
@@ -58,6 +62,8 @@
 <script>
 import Joi from '@hapi/joi';
 
+const SIGNUP_URL = 'http://localhost:3333/auth/signup';
+
 const schema = Joi.object().keys({
   username: Joi.string().regex(/^[a-zA-Z0-9_]+$/).min(2).max(30)
     .required(),
@@ -68,6 +74,7 @@ const schema = Joi.object().keys({
 export default {
   data: () => ({
     errorMessage: '',
+    sucessMessage: '',
     user: {
       username: '',
       password: '',
@@ -88,24 +95,44 @@ export default {
         this.errorMessage = 'Password must match';
         return false;
       }
-
-      const result = schema.validate({
+      const result = schema.validateAsync({
         username: this.user.username,
         password: this.user.password,
         confirmPassword: this.user.confirmPassword,
       });
-
-      if (result.error.message.includes('username')) {
-        this.errorMessage = 'Username invalid!';
-      } else {
-        this.errorMessage = 'Password invalid!';
+      if (result.error === undefined) {
+        return true;
       }
-      return true;
+      return false;
     },
     signup() {
       this.errorMessage = '';
+      this.sucessMessage = '';
       if (this.validUser()) {
-        // send data
+        const body = {
+          username: this.user.username,
+          password: this.user.password,
+        };
+        fetch(SIGNUP_URL, {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'content-type': 'application/json',
+          },
+        }).then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          return response.json().then((err) => {
+            throw new Error(err);
+          });
+        }).then((user) => {
+          console.log(user);
+          this.sucessMessage = `${user.result}`;
+          this.$router.push('/login');
+        }).catch((error) => {
+          this.errorMessage = error.message;
+        });
       }
     },
   },
