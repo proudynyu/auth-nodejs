@@ -10,7 +10,11 @@
           {{ sucessMessage }}
         </div>
 
-        <form autocomplete="off" @submit.prevent="signup">
+        <form
+          class="container-md"
+          v-if="!signingUp"
+          autocomplete="off"
+          @submit.prevent="validUser">
         <div class="form-group">
             <label for="username">Username</label>
             <!-- eslint-disable -->
@@ -73,6 +77,7 @@ const schema = Joi.object().keys({
 
 export default {
   data: () => ({
+    signingUp: false,
     errorMessage: '',
     sucessMessage: '',
     user: {
@@ -85,54 +90,62 @@ export default {
     user: {
       handler() {
         this.errorMessage = '';
+        this.sucessMessage = '';
       },
       deep: true,
     },
   },
   methods: {
-    validUser() {
+    async validUser() {
       if (this.user.password !== this.user.confirmPassword) {
         this.errorMessage = 'Password must match';
         return false;
       }
-      const result = schema.validateAsync({
-        username: this.user.username,
-        password: this.user.password,
-        confirmPassword: this.user.confirmPassword,
-      });
-      if (result.error === undefined) {
-        return true;
+      try {
+        await schema.validateAsync({
+          username: this.user.username,
+          password: this.user.password,
+          confirmPassword: this.user.confirmPassword,
+        });
+        return this.signup();
+      } catch (err) {
+        if (err.message.includes('username')) {
+          this.errorMessage = 'Username invalid';
+        }
+        return false;
       }
-      return false;
     },
-    signup() {
+    async signup() {
       this.errorMessage = '';
-      this.sucessMessage = '';
-      if (this.validUser()) {
+      try {
         const body = {
           username: this.user.username,
           password: this.user.password,
         };
-        fetch(SIGNUP_URL, {
+        this.signingUp = true;
+        const data = await fetch(SIGNUP_URL, {
           method: 'POST',
           body: JSON.stringify(body),
           headers: {
             'content-type': 'application/json',
           },
-        }).then((response) => {
-          if (response.ok) {
-            return response.json();
-          }
-          return response.json().then((err) => {
-            throw new Error(err);
-          });
-        }).then((user) => {
-          console.log(user);
-          this.sucessMessage = `${user.result}`;
-          this.$router.push('/login');
-        }).catch((error) => {
-          this.errorMessage = error.message;
         });
+        if (data.status === 400) {
+          this.errorMessage = 'Bad Request';
+          throw new Error(data);
+        }
+        this.sucessMessage = 'Successfully created account';
+        setInterval(() => {
+          this.signingUp = false;
+          this.$router.push('/login').catch((error) => {
+            if (error.name !== 'NavigationDuplicated') {
+              throw error;
+            }
+          });
+        }, 1000);
+      } catch (err) {
+        setInterval(1000);
+        this.signingUp = false;
       }
     },
   },
