@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 // const morgan = require('morgan');
 const routes = require('./routes');
@@ -12,6 +13,10 @@ mongoose.connect(`${process.env.DATABASE_URL}`, {
 });
 
 const app = express();
+
+app.use(cors({
+    origin: `${process.env.ORIGIN}`,
+}));
 
 // app.use(morgan('tiny'));
 app.use(express.json());
