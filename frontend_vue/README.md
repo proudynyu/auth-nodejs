@@ -17,3 +17,12 @@
     * [] Using .then to resolve errors
         * [] output the user
         * [] output the error
+
+Home Page:
+![Home-Page](https://github.com/proudynyu/auth-nodejs/blob/master/frontend_vue/public/home_page.jpg)
+
+Register:
+![Register](https://github.com/proudynyu/auth-nodejs/blob/master/frontend_vue/public/register-page.jpg)
+
+Login:
+![Login](https://github.com/proudynyu/auth-nodejs/blob/master/frontend_vue/public/login-page.jpg)
