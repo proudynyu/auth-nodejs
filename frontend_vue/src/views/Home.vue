@@ -10,6 +10,11 @@
          class="btn btn-primary btn-lg"
          :to="{ name:'Signup' }"
          role="button">Sign Up</router-link>
+        <router-link
+         class="btn btn-outline-primary btn-lg"
+         :to="{ name:'Login' }"
+         style="margin-left: 10px;"
+         role="button">Sign In</router-link>
       </p>
     </div>
   </div>

@@ -1,11 +1,15 @@
 <template>
   <div>
-    <h1>Login</h1>
     <div v-if="errorMessage" class="alert alert-danger" role="alert">
       {{ errorMessage }}
     </div>
     <!-- eslint-disable -->
-    <form>
+    <form
+      class="container-sm mt-5"
+      style="width: 40vw; min-width: 400px;"
+      autocomplete="off"
+      @submit.prevent="signin">
+        <h1>Login</h1>
         <div class="form-group">
             <label for="username">Username</label>
             <input
@@ -39,7 +43,6 @@ const schema = Joi.object().keys({
   username: Joi.string().regex(/^[a-zA-Z0-9_]+$/).min(2).max(30)
     .required(),
   password: Joi.string().trim().min(10).required(),
-  confirmPassword: Joi.string().trim().min(10).required(),
 });
 
 export default {
@@ -88,9 +91,15 @@ export default {
             },
           });
           if (data.ok) {
+            const result = await data.json();
+            localStorage.token = result.token;
             setInterval(() => {
               this.sucessMessage = 'Login in';
-              this.$router.push('/');
+              this.$router.push('/dashboard').catch((error) => {
+                if (error.name !== 'NavigationDuplicated') {
+                  throw error;
+                }
+              });
             }, 1000);
           }
           throw new Error(data);

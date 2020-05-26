@@ -135,6 +135,8 @@ export default {
           throw new Error(data);
         }
         this.sucessMessage = 'Successfully created account';
+        const result = await data.json();
+        localStorage.token = result.token;
         setInterval(() => {
           this.signingUp = false;
           this.$router.push('/login').catch((error) => {
