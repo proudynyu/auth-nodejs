@@ -7,9 +7,23 @@ import Dashboard from '../views/Dashboard.vue';
 
 Vue.use(VueRouter);
 
-function isLogged(to, from, next) {
+const DASH_URL = 'http://localhost:3333/auth/dashboard';
+
+async function isLogged(to, from, next) {
   if (localStorage.token) {
-    next('/dashboard');
+    const body = {
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${localStorage.token}`,
+        'content-type': 'application/json',
+      },
+    };
+    const data = await fetch(DASH_URL, body);
+    const result = await data.json();
+    if (result.success === 'ok') {
+      next('/dashboard');
+    }
+    next();
   } else {
     next();
   }
