@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const Joi = require('@hapi/joi');
-const jwt = require('jsonwebtoken');
+const generateToken = require('../utils/generateToken');
 
 const UserModel = require('../models/User');
 
@@ -31,13 +31,17 @@ router.post('/signup', async (req, res, next) => {
             .then(hashedPass => {
                 const user = {
                     username: username,
-                    password: hashedPass
+                    password: hashedPass,
                 };
 
                 UserModel.create(user);
                 user.password = undefined;
+                const token = generateToken(user.id)
 
-                return res.status(200).json({result: `${user.username} is created!`})
+                return res.status(200).json({
+                    result: `${user.username} is created!`,
+                    token: token,
+                })
             })
 
     } catch(err){
@@ -64,9 +68,11 @@ router.post('/signin', async (req, res, next) => {
 
         const result = await bcrypt.compare(password, user.password);
 
-        if (result)
-            return res.status(200).json({ success: 'Login in' });
-        
+        if (result) {
+            const token = generateToken(user.id); 
+            return res.status(200).json({ token });
+        }
+       
         return res.status(400).json({ error: 'Failed to login' });
 
     } catch(err) {
