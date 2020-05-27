@@ -15,7 +15,10 @@ mongoose.connect(`${process.env.DATABASE_URL}`, {
 const app = express();
 
 app.use(cors({
-    origin: `${process.env.ORIGIN}`,
+    origin: {
+        vue: `${process.env.VUE}`,
+        react: `${process.env.REACT}`,
+    },
 }));
 
 // app.use(morgan('tiny'));
