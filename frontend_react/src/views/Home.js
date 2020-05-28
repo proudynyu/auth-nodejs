@@ -14,6 +14,11 @@ export default function Home(){
                 to="/signup"
                 role="button"
             >SignUp</Link>
+            <Link
+                className="btn btn-primary btn-md ml-2"
+                to="/signin"
+                role="button"
+            >Sign In</Link>
             </p>
         </div>
     );

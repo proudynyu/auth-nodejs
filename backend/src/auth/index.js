@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const Joi = require('@hapi/joi');
 const generateToken = require('../utils/generateToken');
+const auth = require('../middleware/validToken');
 
 const UserModel = require('../models/User');
 
@@ -14,7 +15,7 @@ const schema = Joi.object({
 
 // any request in /auth goes here
 
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', async (req, res, next) => {  
     const { username, password } = req.body;
 
     try{
@@ -78,6 +79,10 @@ router.post('/signin', async (req, res, next) => {
     } catch(err) {
         next(err);
     }
-})
+});
+
+router.get('/dashboard', auth.validToken, (req, res) => {
+    return res.status(200).json({ success: 'ok' }); 
+});
 
 module.exports = router;

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import 'bootswatch/dist/lux/bootstrap.css';
+import 'bootswatch/dist/cyborg/bootstrap.css';
 
 
 ReactDOM.render(
