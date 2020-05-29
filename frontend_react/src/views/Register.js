@@ -25,8 +25,7 @@ export default function Register(){
     };
 
     useEffect(() => {
-        if (isError === true)
-            setIsError(false);
+        if (isError === true) setIsError(false);
     }, [name, password, confirmPass]);
 
     async function validateUser(){
@@ -58,8 +57,8 @@ export default function Register(){
         if (!validation) return;
         try {
             const data = await API('auth/signup', user, 'POST');
-            const result = await data.json();
             if (data.status !== 200) throw result;
+            const result = await data.json();
             localStorage.token = result.token;
             history.push('/dashboard');
 

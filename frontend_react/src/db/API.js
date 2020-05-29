@@ -6,7 +6,7 @@ export default async function API(endpoint, userObject = {}, method = 'GET') {
             'content-type':'application/json'
         },
         body: JSON.stringify({
-            username: userObject.user,
+            username: userObject.username,
             password: userObject.password,
         }),
     };

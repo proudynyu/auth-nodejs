@@ -50,9 +50,9 @@ export default function SigIn() {
         const validation = await validateUser();
         if (!validation) return;
         try {
-            const data = await API('/auth/signin', user, 'POST');
-            const result = await data.json();
+            const data = await API('auth/signin', user, 'POST');
             if (data.status !== 200) throw result;
+            const result = await data.json();
             localStorage.token = result.token;
             history.push('/dashboard');
         } catch (err) {
