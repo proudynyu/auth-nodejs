@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Joi from '@hapi/joi';
+import API from '../db/API';
 
 export default function SigIn() {
     const history = useHistory();
@@ -9,8 +10,6 @@ export default function SigIn() {
     const [password, setPassword] = useState('');
     const [isError, setIsError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-
-    const LOG_URL = 'http://localhost:3333/auth/signin';
 
     useEffect(() => {
         if (isError === true) {
@@ -48,25 +47,13 @@ export default function SigIn() {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        const result = await validateUser();
-        const fetchBody = {
-            method: 'POST',
-            headers: {
-                'content-type':'application/json',
-            },
-            body: JSON.stringify(user),
-        };
-        if (!result) {
-            return
-        }
+        const validation = await validateUser();
+        if (!validation) return;
         try {
-            const data = await fetch(LOG_URL, fetchBody);
-            if (data.status !== 200) {
-                const error = await data.json();
-                throw error;
-            }
-            const token = await data.json();
-            localStorage.token = token.token;
+            const data = await API('/auth/signin', user, 'POST');
+            const result = await data.json();
+            if (data.status !== 200) throw result;
+            localStorage.token = result.token;
             history.push('/dashboard');
         } catch (err) {
             setErrorMsg(err.error);

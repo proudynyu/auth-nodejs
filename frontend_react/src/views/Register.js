@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Joi from '@hapi/joi';
+import API from '../db/API';
 
 export default function Register(){
     const history = useHistory();
@@ -10,10 +11,7 @@ export default function Register(){
     const [confirmPass, setConfirmPass] = useState('');
     const [isError, setIsError] = useState(false);
     const [errorMgs, setErrorMsg] = useState('');
-    // const [isLoggin, setIsLoggin] = useState(false);
 
-    const REG_URL = 'http://localhost:3333/auth/signup';
-    
     const schema = Joi.object().keys({
         username: Joi.string().regex(/^[a-zA-Z0-9_]+$/).min(2).max(30)
           .required(),
@@ -21,14 +19,17 @@ export default function Register(){
         confirmPassword: Joi.string().trim().min(10).required(),
     });
 
+    const user = {
+        username: name,
+        password: password,
+    };
+
     useEffect(() => {
         if (isError === true)
             setIsError(false);
     }, [name, password, confirmPass]);
 
     async function validateUser(){
-        setErrorMsg('');
-        setIsError(false);
         if (password !== confirmPass) {
             setErrorMsg('Password must match');
             setIsError(true);
@@ -53,32 +54,18 @@ export default function Register(){
 
     async function handleSubmit(event){
         event.preventDefault();
-        setErrorMsg('');
-        setIsError(false);
-        const user = await validateUser();
-        if (!user) {
-            return 
-        }
-        const fetchBody = {
-            method: 'POST',
-            headers: {
-                'content-type':'application/json'
-            },
-            body: JSON.stringify({
-                username: name,
-                password: password,
-            }),
-        };
+        const validation = await validateUser();
+        if (!validation) return;
         try {
-            const data = await fetch(REG_URL, fetchBody);
-            if (data.status === 200) {
-                const result = await data.json();
-                localStorage.token = result.token;
-                history.push('/dashboard');
-            }
+            const data = await API('auth/signup', user, 'POST');
+            const result = await data.json();
+            if (data.status !== 200) throw result;
+            localStorage.token = result.token;
+            history.push('/dashboard');
 
         } catch (err) {
             console.log(err.message);
+            return
         }
     }
 
